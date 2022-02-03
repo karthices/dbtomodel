@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script type="text/javascript" src="./smartservice.js"></script>
+</head>
+
+<body>
+    <button id="getAllDbs">Get Db List</button>
+
+    <table id="DBList">
+        <thead>
+            <tr>
+                <th>Sno</th>
+                <th>Database Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <textarea id="ModalJson"></textarea>
+    <script type="text/javascript">
+        const getAllDbs = document.getElementById("getAllDbs");
+        const DBList = document.getElementById("DBList");
+        const ModalJson = document.getElementById("ModalJson");
+
+        const initGenerate = function() {
+            document.querySelectorAll(".generate").forEach((elm) => {
+                elm.addEventListener("click", function(e) {
+                    smartUI.$ajax('operation.php', {
+                        option: 'generatemodel',
+                        dbname: elm.getAttribute("dbname"),
+                    }, function(res) {
+                        var jsondata = JSON.parse(res);
+                        ModalJson.value = jsondata.jsondata;
+
+                    }, function(err) {
+
+                    });
+                });
+
+
+            });
+
+        }
+
+        getAllDbs.addEventListener("click", function(e) {
+            smartUI.$ajax('operation.php', {
+                option: 'getdbs'
+            }, function(res) {
+                var dbs = JSON.parse(res);
+                var i = 0,
+                    dblength = dbs.dblist.length,
+                    str = "";
+                for (i; i < dblength; i++) {
+                    str += '<tr><td>' + (i + 1) + '</td><td>' + dbs.dblist[i] + '</td><td><button class="generate" dbname="' + dbs.dblist[i] + '">generate</button></td></tr>';
+                }
+
+                DBList.querySelector("tbody").innerHTML = str;
+                initGenerate();
+            }, function(err) {
+
+
+            });
+        });
+    </script>
+</body>
+
+</html>
